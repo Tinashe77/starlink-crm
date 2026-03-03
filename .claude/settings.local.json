@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install express mongoose bcryptjs jsonwebtoken nodemailer express-validator cors dotenv express-async-errors)",
+      "Bash(node src/utils/seed.js)"
+    ]
+  }
+}
