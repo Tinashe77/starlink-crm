@@ -6,6 +6,40 @@ const { recalculateContractStatus } = require('../utils/recalculateContractStatu
 
 const roundMoney = (value) => Math.round(value * 100) / 100;
 
+const resolveContractFinancials = ({ application, packageData, requestedDepositPaid, requestedOutstandingBalance }) => {
+  const minimumDeposit = roundMoney(packageData.deposit);
+  const totalContractValue = roundMoney(packageData.totalCost);
+  const durationWeeks = Number(packageData.weeks) || 8;
+  const recordedApplicationDeposit = Number(application.depositAmount || 0);
+  const depositPaid = Boolean(application.depositReceived) || Boolean(requestedDepositPaid);
+  const actualDepositAmount = depositPaid
+    ? roundMoney(recordedApplicationDeposit > 0 ? recordedApplicationDeposit : minimumDeposit)
+    : 0;
+
+  if (depositPaid && actualDepositAmount < minimumDeposit) {
+    throw new Error(`Deposit amount cannot be less than the minimum package deposit of USD ${minimumDeposit.toFixed(2)}`);
+  }
+
+  if (actualDepositAmount > totalContractValue) {
+    throw new Error('Deposit amount cannot be more than the total package cost');
+  }
+
+  const defaultOutstandingBalance = roundMoney(totalContractValue - actualDepositAmount);
+  const outstandingBalance = requestedOutstandingBalance !== undefined
+    ? roundMoney(Number(requestedOutstandingBalance))
+    : defaultOutstandingBalance;
+  const weeklyInstallment = roundMoney(defaultOutstandingBalance / durationWeeks);
+
+  return {
+    depositPaid,
+    depositAmount: actualDepositAmount,
+    outstandingBalance,
+    totalContractValue,
+    weeklyInstallment,
+    durationWeeks,
+  };
+};
+
 const ensurePackageFinancials = async (packageRecord) => {
   let changed = false;
 
@@ -89,14 +123,20 @@ const createContract = async (req, res) => {
   }
 
   const packageData = await ensurePackageFinancials(application.package);
-  const depositAmount = roundMoney(packageData.deposit);
-  const totalContractValue = roundMoney(packageData.totalCost);
-  const depositPaid = req.body.depositPaid ?? Boolean(application.depositReceived);
-  const outstandingBalance = req.body.outstandingBalance !== undefined
-    ? Number(req.body.outstandingBalance)
-    : roundMoney(totalContractValue - (depositPaid ? depositAmount : 0));
+  let financials;
 
-  const status = req.body.status || (depositPaid ? 'Active' : 'Pending Deposit');
+  try {
+    financials = resolveContractFinancials({
+      application,
+      packageData,
+      requestedDepositPaid: req.body.depositPaid,
+      requestedOutstandingBalance: req.body.outstandingBalance,
+    });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+
+  const status = req.body.status || (financials.depositPaid ? 'Active' : 'Pending Deposit');
   const activatedAt = status === 'Active' ? new Date() : undefined;
   const completedAt = status === 'Completed' ? new Date() : undefined;
 
@@ -104,13 +144,13 @@ const createContract = async (req, res) => {
     customer: application.customer._id,
     application: application._id,
     package: packageData._id,
-    totalContractValue,
-    depositAmount,
+    totalContractValue: financials.totalContractValue,
+    depositAmount: financials.depositAmount,
     depositPercent: packageData.depositPercent,
-    weeklyInstallment: roundMoney(packageData.weeklyAmount),
-    durationWeeks: packageData.weeks,
-    depositPaid,
-    outstandingBalance,
+    weeklyInstallment: financials.weeklyInstallment,
+    durationWeeks: financials.durationWeeks,
+    depositPaid: financials.depositPaid,
+    outstandingBalance: financials.outstandingBalance,
     status,
     paymentPlanReady: Boolean(req.body.paymentPlanReady),
     activatedAt,
@@ -147,6 +187,22 @@ const updateContract = async (req, res) => {
       contract[field] = req.body[field];
     }
   });
+
+  if (req.body.depositPaid !== undefined && req.body.outstandingBalance === undefined && req.body.status === undefined) {
+    contract.outstandingBalance = roundMoney(
+      contract.totalContractValue - (contract.depositPaid ? contract.depositAmount : 0)
+    );
+
+    if (contract.depositPaid && contract.status === 'Pending Deposit') {
+      contract.status = 'Active';
+      contract.activatedAt = contract.activatedAt || new Date();
+    }
+
+    if (!contract.depositPaid && contract.status !== 'Completed') {
+      contract.status = 'Pending Deposit';
+      contract.activatedAt = undefined;
+    }
+  }
 
   if (req.body.status === 'Active' && !contract.activatedAt) {
     contract.activatedAt = new Date();

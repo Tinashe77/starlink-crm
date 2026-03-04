@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   CheckCircle2,
   ChevronDown,
   CreditCard,
+  Menu,
   MapPin,
   Rocket,
   Router,
@@ -160,6 +162,8 @@ function ToneBadge({ children, tone = 'blue' }) {
 }
 
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-transparent text-slate-900">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -170,9 +174,18 @@ export default function LandingPage() {
       </div>
 
       <header className="px-4 pt-4 md:px-6 md:pt-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between rounded-[2rem] border border-white/70 bg-white/80 px-5 py-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl md:px-6">
-          <BrandLogo />
-          <div className="hidden items-center gap-2 md:flex">
+        <div className="mx-auto max-w-6xl rounded-[2rem] border border-white/70 bg-white/80 px-5 py-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl md:px-6">
+          <div className="flex items-center justify-between gap-4">
+            <BrandLogo />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-2.5 text-slate-600 shadow-sm transition hover:border-[var(--brand-cyan)]/30 hover:text-[var(--brand-navy)] md:hidden"
+            >
+              {mobileMenuOpen ? <ChevronDown size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+
+          <div className="hidden items-center justify-end gap-2 md:flex">
             <a
               href="#how-it-works"
               className="rounded-2xl px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-[var(--brand-navy)]"
@@ -198,6 +211,48 @@ export default function LandingPage() {
               Portal Login
             </Link>
           </div>
+
+          {mobileMenuOpen ? (
+            <div className="mt-4 space-y-2 border-t border-slate-200/70 pt-4 md:hidden">
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-[var(--brand-navy)]"
+              >
+                How It Works
+              </a>
+              <a
+                href="#packages"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-[var(--brand-navy)]"
+              >
+                Packages
+              </a>
+              <a
+                href="#faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-[var(--brand-navy)]"
+              >
+                FAQ
+              </a>
+              <div className="grid gap-2 pt-2 sm:grid-cols-2">
+                <Link
+                  to="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[var(--brand-navy)] to-[var(--brand-cyan)] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_28px_rgba(23,63,143,0.2)]"
+                >
+                  Apply Now
+                </Link>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-navy)] shadow-sm"
+                >
+                  Portal Login
+                </Link>
+              </div>
+            </div>
+          ) : null}
         </div>
       </header>
 

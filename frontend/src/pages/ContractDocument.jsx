@@ -5,6 +5,7 @@ import { Download, PenLine, RotateCcw } from 'lucide-react';
 import Spinner from '../components/ui/Spinner';
 import { useAuth } from '../context/AuthContext';
 import { getContractById, signContract } from '../api/contracts';
+import BrandLogo from '../components/BrandLogo';
 
 const COMPANY = {
   name: 'SAMUELTECH INSTALLATIONS (PRIVATE) LIMITED',
@@ -157,7 +158,7 @@ function SignatureCanvas({ onChange }) {
         ref={canvasRef}
         width={640}
         height={180}
-        className="w-full border border-gray-300 rounded-lg bg-white touch-none"
+        className="w-full rounded-2xl border border-slate-200 bg-white touch-none shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
@@ -169,7 +170,7 @@ function SignatureCanvas({ onChange }) {
       <button
         type="button"
         onClick={clear}
-        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900"
       >
         <RotateCcw size={14} /> Clear signature
       </button>
@@ -258,18 +259,18 @@ export default function ContractDocument() {
   const packageInfo = contract.package;
 
   return (
-    <div className="bg-gray-100 min-h-full">
-      <div className="print:hidden sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between gap-4">
+    <div className="min-h-full bg-[radial-gradient(circle_at_top_right,rgba(21,169,231,0.10),transparent_28%),radial-gradient(circle_at_top_left,rgba(26,182,108,0.08),transparent_22%),#eef5fb]">
+      <div className="print:hidden sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-white/70 bg-white/85 px-6 py-4 backdrop-blur-xl">
         <div>
-          <h1 className="text-lg font-semibold text-gray-900">{contract.contractRef}</h1>
-          <p className="text-sm text-gray-500">Customer Service Agreement</p>
+          <h1 className="text-lg font-semibold text-slate-900">{contract.contractRef}</h1>
+          <p className="text-sm text-slate-500">StarConnect Africa service agreement</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link to="/contracts" className="text-sm text-gray-600 hover:text-gray-900">Back</Link>
+          <Link to="/contracts" className="text-sm text-slate-600 hover:text-slate-900">Back</Link>
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-lg text-sm font-medium"
+            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[var(--brand-navy)] to-[var(--brand-cyan)] px-4 py-2.5 text-sm font-medium text-white shadow-[0_16px_30px_rgba(23,63,143,0.22)]"
           >
             <Download size={16} /> Download / Print
           </button>
@@ -277,38 +278,50 @@ export default function ContractDocument() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6 print:p-0">
-        <article className="bg-white rounded-2xl shadow-sm border border-gray-200 print:shadow-none print:border-0 p-8 md:p-12 text-[15px] leading-7 text-gray-800">
-          <header className="border-b border-gray-200 pb-6 mb-8">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Customer Service Agreement v1.0</p>
-            <h1 className="text-3xl font-bold text-gray-900 mt-2">STARLINK INSTALLATION SERVICE AGREEMENT</h1>
-            <div className="mt-4 grid gap-1 text-sm text-gray-600">
-              <p><strong>Contract Reference:</strong> {contract.contractRef}</p>
-              <p><strong>Agreement Date:</strong> {formatDate(agreementDate)}</p>
-              <p><strong>Application Reference:</strong> {application?.applicationNo || '____________'}</p>
+        <article className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 text-[15px] leading-7 text-slate-800 shadow-[0_26px_70px_rgba(15,23,42,0.10)] print:rounded-none print:border-0 print:shadow-none">
+          <header className="border-b border-slate-200/70 bg-gradient-to-r from-[var(--brand-navy)] via-[var(--brand-navy)] to-[var(--brand-cyan)] px-8 py-8 text-white print:bg-none print:text-slate-900">
+            <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+              <div>
+                <div className="max-w-md rounded-[1.5rem] border border-white/10 bg-white/10 p-4 backdrop-blur-xl print:border-slate-200 print:bg-slate-50">
+                  <BrandLogo />
+                </div>
+                <p className="mt-5 text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-white/70 print:text-slate-400">Customer Service Agreement v1.0</p>
+                <h1 className="mt-3 text-3xl font-semibold tracking-[-0.05em]">Starlink Installation Service Agreement</h1>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur-xl print:border-slate-200 print:bg-white">
+                <div className="space-y-2 text-sm text-white/90 print:text-slate-700">
+                  <p><strong>Contract Reference:</strong> {contract.contractRef}</p>
+                  <p><strong>Agreement Date:</strong> {formatDate(agreementDate)}</p>
+                  <p><strong>Application Reference:</strong> {application?.applicationNo || '____________'}</p>
+                  <p><strong>Status:</strong> {contract.status}</p>
+                </div>
+              </div>
             </div>
           </header>
 
-          <section className="space-y-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900">PARTIES TO THIS AGREEMENT</h2>
+          <div className="p-8 md:p-10 print:p-0">
+          <section className="mb-10 space-y-6">
+            <h2 className="text-lg font-semibold tracking-[-0.03em] text-slate-900">Parties To This Agreement</h2>
             <p>
               This Service Agreement (the &quot;Agreement&quot;) is entered into on {formatDate(agreementDate)} between:
             </p>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="border border-gray-200 rounded-xl p-5 bg-slate-50">
-                <p className="font-semibold text-gray-900">{COMPANY.name}</p>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-[1.6rem] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+                <p className="font-semibold text-slate-900">{COMPANY.name}</p>
                 <p>({COMPANY.registration})</p>
                 <p>Physical Address: {COMPANY.physicalAddress}</p>
                 <p>Email: {COMPANY.email}</p>
-                <p className="mt-3 text-sm text-gray-600">(Hereinafter referred to as &quot;the Company&quot; or {COMPANY.brand})</p>
+                <p className="mt-3 text-sm text-slate-500">(Hereinafter referred to as &quot;the Company&quot; or {COMPANY.brand})</p>
               </div>
-              <div className="border border-gray-200 rounded-xl p-5">
+              <div className="rounded-[1.6rem] border border-slate-200/80 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
                 <p><strong>Full Name/Company Name:</strong> {customer?.fullName || '____________'}</p>
                 <p><strong>ID Number/Registration:</strong> {customer?.idNumber || '____________'}</p>
                 <p><strong>Physical Address:</strong> {customer?.physicalAddress || '____________'}</p>
                 <p><strong>Phone Number:</strong> {customer?.phonePrimary || '____________'}</p>
                 <p><strong>Email Address:</strong> {customer?.email || '____________'}</p>
                 <p><strong>EcoCash Number:</strong> {application?.ecocash?.number || '____________'}</p>
-                <p className="mt-3 text-sm text-gray-600">(Hereinafter referred to as &quot;the Customer&quot;)</p>
+                <p className="mt-3 text-sm text-slate-500">(Hereinafter referred to as &quot;the Customer&quot;)</p>
               </div>
             </div>
             <p>
@@ -319,7 +332,7 @@ export default function ContractDocument() {
           <section className="space-y-8">
             {ARTICLES.map((article) => (
               <div key={article.title}>
-                <h3 className="text-base font-semibold text-gray-900 mb-3">{article.title}</h3>
+                <h3 className="mb-3 text-base font-semibold tracking-[-0.02em] text-slate-900">{article.title}</h3>
                 {article.items ? (
                   <ol className="list-decimal pl-5 space-y-2">
                     {article.items.map((item) => (
@@ -331,24 +344,28 @@ export default function ContractDocument() {
                   <p key={paragraph} className="mb-2">{paragraph}</p>
                 ))}
                 {article.title === 'ARTICLE 3: PAYMENT TERMS' ? (
-                  <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden">
+                  <div className="mt-5 overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/80 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+                    <div className="border-b border-slate-200/70 px-5 py-4">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[var(--brand-cyan)]">Schedule A</p>
+                      <h4 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-slate-900">Payment Summary</h4>
+                    </div>
                     <table className="w-full text-sm">
                       <tbody>
-                        <tr className="border-b border-gray-200">
-                          <td className="px-4 py-3 font-medium text-gray-700">Package</td>
-                          <td className="px-4 py-3">{packageInfo?.name || 'Starlink Equipment'}</td>
+                        <tr className="border-b border-slate-200/70">
+                          <td className="px-5 py-4 font-medium text-slate-600">Package</td>
+                          <td className="px-5 py-4 font-semibold text-slate-900">{packageInfo?.name || 'Starlink Equipment'}</td>
                         </tr>
-                        <tr className="border-b border-gray-200">
-                          <td className="px-4 py-3 font-medium text-gray-700">Initial Deposit</td>
-                          <td className="px-4 py-3">USD {contract.depositAmount?.toFixed(2)}</td>
+                        <tr className="border-b border-slate-200/70">
+                          <td className="px-5 py-4 font-medium text-slate-600">Initial Deposit</td>
+                          <td className="px-5 py-4 font-semibold text-slate-900">USD {contract.depositAmount?.toFixed(2)}</td>
                         </tr>
-                        <tr className="border-b border-gray-200">
-                          <td className="px-4 py-3 font-medium text-gray-700">Weekly Instalment</td>
-                          <td className="px-4 py-3">USD {contract.weeklyInstallment?.toFixed(2)} x {contract.durationWeeks}</td>
+                        <tr className="border-b border-slate-200/70">
+                          <td className="px-5 py-4 font-medium text-slate-600">Weekly Instalment</td>
+                          <td className="px-5 py-4 font-semibold text-slate-900">USD {contract.weeklyInstallment?.toFixed(2)} x {contract.durationWeeks}</td>
                         </tr>
-                        <tr>
-                          <td className="px-4 py-3 font-semibold text-gray-900">TOTAL CONTRACT VALUE</td>
-                          <td className="px-4 py-3 font-semibold text-gray-900">USD {contract.totalContractValue?.toFixed(2)}</td>
+                        <tr className="bg-slate-50/70">
+                          <td className="px-5 py-4 font-semibold text-slate-900">Total Contract Value</td>
+                          <td className="px-5 py-4 font-semibold text-slate-900">USD {contract.totalContractValue?.toFixed(2)}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -359,27 +376,27 @@ export default function ContractDocument() {
           </section>
 
           <section className="mt-12">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">SIGNATURES</h2>
+            <h2 className="mb-4 text-lg font-semibold tracking-[-0.03em] text-slate-900">Signatures</h2>
             <p className="mb-6">The parties hereto have executed this Agreement as of the date first written above.</p>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="border border-gray-200 rounded-xl p-5">
-                <p className="font-semibold text-gray-900 mb-4">FOR AND ON BEHALF OF {COMPANY.name}</p>
+            <div className="grid gap-8 md:grid-cols-2">
+              <div className="rounded-[1.6rem] border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+                <p className="mb-4 font-semibold text-slate-900">For And On Behalf Of {COMPANY.name}</p>
                 <p><strong>Name:</strong> {companySigner}</p>
                 <p><strong>Title:</strong> Contract Administrator</p>
                 <p><strong>Date:</strong> {formatDate(agreementDate)}</p>
               </div>
 
-              <div className="border border-gray-200 rounded-xl p-5">
-                <p className="font-semibold text-gray-900 mb-4">CUSTOMER</p>
+              <div className="rounded-[1.6rem] border border-slate-200/80 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+                <p className="mb-4 font-semibold text-slate-900">Customer</p>
                 {contract.customerSigned && contract.customerSignatureDataUrl ? (
                   <img
                     src={contract.customerSignatureDataUrl}
                     alt="Customer signature"
-                    className="h-20 object-contain mb-3 border-b border-gray-200"
+                    className="mb-3 h-20 object-contain border-b border-slate-200"
                   />
                 ) : (
-                  <div className="h-20 mb-3 border-b border-dashed border-gray-300" />
+                  <div className="mb-3 h-20 border-b border-dashed border-slate-300" />
                 )}
                 <p><strong>Full Name:</strong> {contract.customerSignatureName || customer?.fullName || '____________'}</p>
                 <p><strong>ID Number:</strong> {customer?.idNumber || '____________'}</p>
@@ -387,48 +404,51 @@ export default function ContractDocument() {
               </div>
             </div>
 
-            <div className="mt-8 border border-gray-200 rounded-xl p-5">
-              <p className="font-semibold text-gray-900 mb-3">WITNESS</p>
+            <div className="mt-8 rounded-[1.6rem] border border-slate-200/80 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+              <p className="mb-3 font-semibold text-slate-900">Witness</p>
               <p><strong>Full Name:</strong> {contract.witnessName || '____________'}</p>
               <p><strong>ID Number:</strong> {contract.witnessIdNumber || '____________'}</p>
               <p><strong>Date:</strong> {formatDate(contract.witnessSignedAt)}</p>
             </div>
           </section>
+          </div>
         </article>
 
         {canSign && (
-          <form onSubmit={handleSign} className="print:hidden mt-6 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+          <form onSubmit={handleSign} className="print:hidden mt-6 space-y-5 rounded-[2rem] border border-white/80 bg-white/90 p-6 shadow-[0_22px_56px_rgba(15,23,42,0.08)]">
             <div className="flex items-center gap-2">
-              <PenLine size={18} className="text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Sign Contract Online</h2>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[rgba(21,169,231,0.10)] text-[var(--brand-cyan)]">
+                <PenLine size={18} />
+              </span>
+              <h2 className="text-lg font-semibold tracking-[-0.03em] text-slate-900">Sign Contract Online</h2>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500">
               Draw your signature below, then save. After signing, use Download / Print to keep a copy.
             </p>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
               <label className="block">
-                <span className="block text-sm font-medium text-gray-700 mb-1">Customer Name</span>
+                <span className="mb-1 block text-sm font-medium text-slate-700">Customer Name</span>
                 <input
                   required
                   value={signatureName}
                   onChange={(e) => setSignatureName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-2xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)]"
                 />
               </label>
               <label className="block">
-                <span className="block text-sm font-medium text-gray-700 mb-1">Witness Name (optional)</span>
+                <span className="mb-1 block text-sm font-medium text-slate-700">Witness Name (optional)</span>
                 <input
                   value={witnessName}
                   onChange={(e) => setWitnessName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-2xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)]"
                 />
               </label>
               <label className="block md:col-span-2">
-                <span className="block text-sm font-medium text-gray-700 mb-1">Witness ID Number (optional)</span>
+                <span className="mb-1 block text-sm font-medium text-slate-700">Witness ID Number (optional)</span>
                 <input
                   value={witnessIdNumber}
                   onChange={(e) => setWitnessIdNumber(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-2xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)]"
                 />
               </label>
             </div>
@@ -436,7 +456,7 @@ export default function ContractDocument() {
             <button
               type="submit"
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium inline-flex items-center gap-2 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[var(--brand-navy)] to-[var(--brand-cyan)] px-5 py-3 text-sm font-medium text-white shadow-[0_16px_30px_rgba(23,63,143,0.22)] disabled:opacity-60"
             >
               {saving ? <Spinner size="sm" /> : <PenLine size={16} />}
               {saving ? 'Saving Signature...' : 'Sign Contract'}

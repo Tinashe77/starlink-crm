@@ -100,6 +100,21 @@ export default function Contracts() {
   const selectedApplication = approvedApplications.find(
     (application) => application._id === createForm.application
   );
+  const selectedDeposit = selectedApplication
+    ? (
+      selectedApplication.depositReceived
+        ? Number(selectedApplication.depositAmount || selectedApplication.package?.deposit || 0)
+        : 0
+    )
+    : 0;
+  const selectedRemainingBalance = selectedApplication
+    ? Math.max(Number(selectedApplication.package?.totalCost || 0) - selectedDeposit, 0)
+    : 0;
+  const selectedWeeklyInstallment = selectedApplication
+    ? (Number(selectedApplication.package?.weeks || 0) > 0
+      ? selectedRemainingBalance / Number(selectedApplication.package?.weeks || 1)
+      : 0)
+    : 0;
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -259,7 +274,14 @@ export default function Contracts() {
                 <select
                   required
                   value={createForm.application}
-                  onChange={(e) => setCreateForm((current) => ({ ...current, application: e.target.value }))}
+                  onChange={(e) => {
+                    const nextApplication = approvedApplications.find((application) => application._id === e.target.value);
+                    setCreateForm((current) => ({
+                      ...current,
+                      application: e.target.value,
+                      depositPaid: Boolean(nextApplication?.depositReceived),
+                    }));
+                  }}
                   className={`${inputClassName} bg-white`}
                 >
                   <option value="">Select an application</option>
@@ -276,8 +298,10 @@ export default function Contracts() {
                   <div>Customer: {selectedApplication.customer?.fullName}</div>
                   <div>Package: {selectedApplication.package?.name}</div>
                   <div>Total Contract Value: USD {selectedApplication.package?.totalCost?.toFixed(2)}</div>
-                  <div>Deposit: USD {selectedApplication.package?.deposit?.toFixed(2)} ({selectedApplication.package?.depositPercent}%)</div>
-                  <div>Weekly Installment: USD {selectedApplication.package?.weeklyAmount?.toFixed(2)} x {selectedApplication.package?.weeks}</div>
+                  <div>Minimum Deposit: USD {selectedApplication.package?.deposit?.toFixed(2)} ({selectedApplication.package?.depositPercent}%)</div>
+                  <div>Recorded Deposit: USD {selectedDeposit.toFixed(2)}</div>
+                  <div>Remaining Balance: USD {selectedRemainingBalance.toFixed(2)}</div>
+                  <div>Weekly Installment: USD {selectedWeeklyInstallment.toFixed(2)} x {selectedApplication.package?.weeks}</div>
                 </div>
               )}
 

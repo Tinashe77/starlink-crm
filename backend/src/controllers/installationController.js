@@ -90,8 +90,7 @@ const getInstallationOptions = async (req, res) => {
   const contracts = await Contract.find({
     _id: { $nin: usedContractIds },
     depositPaid: true,
-    customerSigned: true,
-    status: { $in: ['Active', 'In Arrears', 'Completed'] },
+    status: { $ne: 'Default' },
   })
     .populate('customer', 'fullName phonePrimary email customerType')
     .populate('package', 'name type')
@@ -114,10 +113,6 @@ const createInstallation = async (req, res) => {
 
   if (!contract.depositPaid) {
     return res.status(400).json({ message: 'Deposit must be paid before creating an installation job' });
-  }
-
-  if (!contract.customerSigned) {
-    return res.status(400).json({ message: 'The customer must sign the contract before installation is scheduled' });
   }
 
   const existing = await InstallationJob.findOne({ contract: contract._id });

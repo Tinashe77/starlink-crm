@@ -16,6 +16,7 @@ import {
   ShieldAlert,
   BellRing,
   Wrench,
+  LifeBuoy,
 } from 'lucide-react';
 import BrandLogo from '../components/BrandLogo';
 
@@ -23,10 +24,11 @@ const ALL_ROLES = ['Admin', 'Agent', 'Technician', 'Collections Officer', 'Custo
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ALL_ROLES },
-  { to: '/customer-applications', label: 'Applications', icon: ClipboardList, roles: ALL_ROLES },
-  { to: '/contracts', label: 'Contracts', icon: FileSignature, roles: ALL_ROLES },
-  { to: '/payment-plans', label: 'Payment Plans', icon: CalendarClock, roles: ALL_ROLES },
+  { to: '/customer-applications', label: 'Applications', icon: ClipboardList, roles: ['Admin', 'Agent', 'Customer'] },
+  { to: '/contracts', label: 'Contracts', icon: FileSignature, roles: ['Admin', 'Agent', 'Collections Officer', 'Customer'] },
+  { to: '/payment-plans', label: 'Payment Plans', icon: CalendarClock, roles: ['Admin', 'Agent', 'Collections Officer', 'Customer'] },
   { to: '/installations', label: 'Installations', icon: Wrench, roles: ['Admin', 'Agent', 'Technician', 'Customer'] },
+  { to: '/support-tickets', label: 'Support Tickets', icon: LifeBuoy, roles: ['Admin', 'Agent', 'Technician', 'Customer'] },
   { to: '/collections', label: 'Collections', icon: ShieldAlert, roles: ['Admin', 'Agent', 'Collections Officer'] },
   { to: '/packages', label: 'Packages', icon: Package, roles: ['Admin'] },
   { to: '/users', label: 'Users', icon: Users, roles: ['Admin'] },
@@ -36,7 +38,8 @@ export default function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const handleLogout = () => {
@@ -49,25 +52,40 @@ export default function AppLayout() {
 
   return (
     <div className="app-shell flex h-screen overflow-hidden bg-transparent p-3 md:p-4">
-      <aside
-        className={`glass-panel sticky top-3 md:top-4 relative flex h-full flex-col overflow-hidden rounded-[2rem] text-slate-900 transition-all duration-300 ${
-          sidebarOpen ? 'w-72 px-3 py-3' : 'w-[5.4rem] px-2 py-3'
+      <div
+        onClick={() => setMobileSidebarOpen(false)}
+        className={`fixed inset-0 z-30 bg-slate-950/35 backdrop-blur-sm transition-opacity md:hidden ${
+          mobileSidebarOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         }`}
+      />
+
+      <aside
+        className={`glass-panel fixed inset-y-3 left-3 z-40 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[2rem] px-3 py-3 text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.16)] transition-all duration-300 md:static md:inset-auto md:z-auto md:h-full md:shadow-none ${
+          mobileSidebarOpen ? 'translate-x-0' : '-translate-x-[120%]'
+        } ${sidebarCollapsed ? 'md:w-[5.4rem] md:px-2' : 'md:w-72 md:px-3'} md:translate-x-0`}
       >
         <div className="flex items-center justify-between px-3 py-3">
           <div className="overflow-hidden">
-            <BrandLogo compact={!sidebarOpen} />
+            <BrandLogo compact={sidebarCollapsed} />
           </div>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="ml-2 rounded-2xl border border-slate-200/80 bg-white/80 p-2 text-slate-500 shadow-sm transition hover:border-[var(--brand-cyan)]/40 hover:text-[var(--brand-navy)]"
-          >
-            {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          <div className="ml-2 flex items-center gap-2">
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="hidden rounded-2xl border border-slate-200/80 bg-white/80 p-2 text-slate-500 shadow-sm transition hover:border-[var(--brand-cyan)]/40 hover:text-[var(--brand-navy)] md:block"
+            >
+              {sidebarCollapsed ? <Menu size={18} /> : <X size={18} />}
+            </button>
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className="rounded-2xl border border-slate-200/80 bg-white/80 p-2 text-slate-500 shadow-sm transition hover:border-[var(--brand-cyan)]/40 hover:text-[var(--brand-navy)] md:hidden"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="mx-2 mb-4 rounded-3xl border border-white/60 bg-gradient-to-br from-[var(--brand-navy)] via-[var(--brand-navy)] to-[var(--brand-cyan)] p-4 text-white shadow-[0_18px_36px_rgba(21,169,231,0.18)]">
-          {sidebarOpen ? (
+          {!sidebarCollapsed ? (
             <>
               <p className="text-xs uppercase tracking-[0.28em] text-white/70">Control Center</p>
               <p className="mt-2 text-sm font-medium leading-6 text-white/90">
@@ -89,6 +107,7 @@ export default function AppLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
+                onClick={() => setMobileSidebarOpen(false)}
                 className={({ isActive }) =>
                   `group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition-all ${
                     isActive
@@ -100,7 +119,7 @@ export default function AppLayout() {
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white to-slate-100 text-[var(--brand-navy)] shadow-sm ring-1 ring-slate-200/80 group-hover:ring-[var(--brand-cyan)]/25">
                   <NavIcon size={18} className="shrink-0" />
                 </span>
-                {sidebarOpen && <span className="truncate">{item.label}</span>}
+                {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
               </NavLink>
             );
           })}
@@ -115,7 +134,7 @@ export default function AppLayout() {
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--brand-navy)] to-[var(--brand-cyan)] font-bold text-sm text-white shadow-[0_12px_24px_rgba(23,63,143,0.22)]">
                 {user?.name?.charAt(0).toUpperCase()}
               </div>
-              {sidebarOpen && (
+              {!sidebarCollapsed && (
                 <>
                   <div className="flex-1 text-left overflow-hidden">
                     <p className="truncate text-sm font-semibold text-slate-900">{user?.name}</p>
@@ -126,10 +145,14 @@ export default function AppLayout() {
               )}
             </button>
 
-            {profileOpen && sidebarOpen && (
+            {profileOpen && !sidebarCollapsed && (
               <div className="absolute bottom-full left-0 z-10 mb-2 w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_20px_44px_rgba(15,23,42,0.12)]">
                 <button
-                  onClick={() => { navigate('/change-password'); setProfileOpen(false); }}
+                  onClick={() => {
+                    navigate('/change-password');
+                    setProfileOpen(false);
+                    setMobileSidebarOpen(false);
+                  }}
                   className="flex w-full items-center gap-2 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50"
                 >
                   <KeyRound size={14} /> Change Password
@@ -146,9 +169,21 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col overflow-hidden pl-3 md:pl-4">
+      <main className={`flex min-w-0 flex-1 flex-col overflow-hidden ${sidebarCollapsed ? 'md:pl-3' : 'md:pl-4'}`}>
         <header className="glass-panel-strong mb-3 flex flex-col gap-4 rounded-[2rem] px-5 py-4 md:mb-4 md:flex-row md:items-center md:justify-between md:px-6">
           <div className="min-w-0">
+            <div className="mb-3 flex items-center gap-3 md:hidden">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="rounded-2xl border border-slate-200/80 bg-white/80 p-2.5 text-slate-500 shadow-sm transition hover:border-[var(--brand-cyan)]/40 hover:text-[var(--brand-navy)]"
+              >
+                <Menu size={18} />
+              </button>
+              <div className="min-w-0">
+                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.32em] text-slate-400">Navigation</p>
+                <p className="truncate text-sm font-semibold text-slate-900">{activeItem?.label || 'Workspace'}</p>
+              </div>
+            </div>
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.38em] text-slate-400">StarConnect Africa Portal</p>
             <h1 className="mt-1 truncate text-2xl font-semibold tracking-[-0.04em] text-slate-900">
               {activeItem?.label || 'Workspace'}
@@ -167,7 +202,7 @@ export default function AppLayout() {
           </div>
         </header>
 
-        <section className="glass-panel-strong min-h-0 flex-1 overflow-y-auto rounded-[2rem]">
+        <section className="glass-panel-strong min-h-0 flex-1 overflow-auto rounded-[2rem]">
           <Outlet />
         </section>
       </main>

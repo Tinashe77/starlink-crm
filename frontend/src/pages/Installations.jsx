@@ -218,7 +218,7 @@ export default function Installations() {
         <>
           {canCreate && options.contracts.length === 0 ? (
             <div className="bg-amber-50 border border-amber-200 text-amber-700 rounded-xl p-4 text-sm">
-              No contracts are currently eligible for a new installation job. Contracts must have a paid deposit and a signed agreement.
+              No contracts are currently eligible for a new installation job. Contracts must have a paid deposit.
             </div>
           ) : null}
 

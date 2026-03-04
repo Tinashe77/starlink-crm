@@ -3,6 +3,7 @@ const Package = require('../models/Package');
 const { syncCustomerApplication } = require('../utils/syncCustomerApplication');
 
 const formatApplicationNumber = (sequence) => `UT-APP-${String(sequence).padStart(4, '0')}`;
+const roundMoney = (value) => Math.round(Number(value || 0) * 100) / 100;
 
 const buildAccessFilter = (req) => {
   if (req.user.role === 'Customer') {
@@ -15,6 +16,42 @@ const buildAccessFilter = (req) => {
 const canAccessApplication = (req, application) => {
   if (req.user.role !== 'Customer') return true;
   return application.createdBy?.equals(req.user._id);
+};
+
+const resolveOfficeDeposit = ({ packageRecord, depositReceived, depositAmount }) => {
+  const hasAmount = depositAmount !== undefined && depositAmount !== null && depositAmount !== '';
+  const parsedAmount = hasAmount ? Number(depositAmount) : undefined;
+  const minimumDeposit = roundMoney(packageRecord.deposit);
+  const totalCost = roundMoney(packageRecord.totalCost);
+
+  if (hasAmount && (!Number.isFinite(parsedAmount) || parsedAmount < 0)) {
+    return { error: 'Deposit amount must be 0 or greater' };
+  }
+
+  if (hasAmount && parsedAmount > totalCost) {
+    return { error: 'Deposit amount cannot be more than the total package cost' };
+  }
+
+  if (hasAmount && parsedAmount > 0 && parsedAmount < minimumDeposit) {
+    return { error: `Deposit amount cannot be less than the minimum package deposit of USD ${minimumDeposit.toFixed(2)}` };
+  }
+
+  if (depositReceived === true && hasAmount && parsedAmount < minimumDeposit) {
+    return { error: `Deposit amount cannot be less than the minimum package deposit of USD ${minimumDeposit.toFixed(2)}` };
+  }
+
+  const normalizedDepositReceived = depositReceived === undefined
+    ? (hasAmount ? parsedAmount > 0 : undefined)
+    : (hasAmount ? parsedAmount > 0 : Boolean(depositReceived));
+
+  const normalizedDepositAmount = normalizedDepositReceived
+    ? roundMoney(hasAmount ? parsedAmount : minimumDeposit)
+    : (hasAmount ? roundMoney(parsedAmount) : undefined);
+
+  return {
+    officeDepositReceived: normalizedDepositReceived,
+    officeDepositAmount: normalizedDepositAmount,
+  };
 };
 
 const buildApplicationPayload = (body) => ({
@@ -102,9 +139,20 @@ const createCustomerApplication = async (req, res) => {
     return res.status(400).json({ message: 'Selected package is inactive or no longer available' });
   }
 
+  const normalizedDeposit = resolveOfficeDeposit({
+    packageRecord: activePackage,
+    depositReceived: req.body.officeDepositReceived,
+    depositAmount: req.body.officeDepositAmount,
+  });
+
+  if (normalizedDeposit.error) {
+    return res.status(400).json({ message: normalizedDeposit.error });
+  }
+
   const count = await CustomerApplication.countDocuments();
   const application = await CustomerApplication.create({
     ...buildApplicationPayload(req.body),
+    ...normalizedDeposit,
     applicationNumber: formatApplicationNumber(count + 1),
     createdBy: req.user._id,
     approvedBy: req.body.status === 'Approved' ? req.user._id : undefined,
@@ -141,7 +189,23 @@ const updateCustomerApplication = async (req, res) => {
     return res.status(400).json({ message: 'Selected package is inactive or no longer available' });
   }
 
+  const packageForValidation = activePackage || await Package.findOne({ name: application.packageName });
+  if (!packageForValidation) {
+    return res.status(400).json({ message: 'The selected package is no longer available' });
+  }
+
+  const normalizedDeposit = resolveOfficeDeposit({
+    packageRecord: packageForValidation,
+    depositReceived: req.body.officeDepositReceived,
+    depositAmount: req.body.officeDepositAmount,
+  });
+
+  if (normalizedDeposit.error) {
+    return res.status(400).json({ message: normalizedDeposit.error });
+  }
+
   Object.assign(application, buildApplicationPayload(req.body));
+  Object.assign(application, normalizedDeposit);
 
   if (req.body.status === 'Approved') {
     application.approvedBy = req.user._id;

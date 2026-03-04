@@ -17,8 +17,8 @@ const contractStatuses = ['Pending Deposit', 'Active', 'In Arrears', 'Default', 
 
 router.use(protect);
 
-router.get('/', authorize('Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer'), getContracts);
-router.get('/:id', authorize('Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer'), getContractById);
+router.get('/', authorize('Admin', 'Agent', 'Collections Officer', 'Customer'), getContracts);
+router.get('/:id', authorize('Admin', 'Agent', 'Collections Officer', 'Customer'), getContractById);
 
 router.post(
   '/',

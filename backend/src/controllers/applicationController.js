@@ -5,6 +5,43 @@ const Package = require('../models/Package');
 const { syncCustomerApplication } = require('../utils/syncCustomerApplication');
 
 const STAFF_ROLES = ['Admin', 'Agent'];
+const roundMoney = (value) => Math.round(Number(value || 0) * 100) / 100;
+
+const resolveDepositUpdate = ({ packageRecord, depositReceived, depositAmount }) => {
+  const hasAmount = depositAmount !== undefined && depositAmount !== null && depositAmount !== '';
+  const parsedAmount = hasAmount ? Number(depositAmount) : undefined;
+  const minimumDeposit = roundMoney(packageRecord.deposit);
+  const totalCost = roundMoney(packageRecord.totalCost);
+
+  if (hasAmount && (!Number.isFinite(parsedAmount) || parsedAmount < 0)) {
+    return { error: 'Deposit amount must be 0 or greater' };
+  }
+
+  if (hasAmount && parsedAmount > totalCost) {
+    return { error: 'Deposit amount cannot be more than the total package cost' };
+  }
+
+  if (hasAmount && parsedAmount > 0 && parsedAmount < minimumDeposit) {
+    return { error: `Deposit amount cannot be less than the minimum package deposit of USD ${minimumDeposit.toFixed(2)}` };
+  }
+
+  if (depositReceived === true && hasAmount && parsedAmount < minimumDeposit) {
+    return { error: `Deposit amount cannot be less than the minimum package deposit of USD ${minimumDeposit.toFixed(2)}` };
+  }
+
+  const normalizedDepositReceived = depositReceived === undefined
+    ? (hasAmount ? parsedAmount > 0 : undefined)
+    : (hasAmount ? parsedAmount > 0 : Boolean(depositReceived));
+
+  const normalizedDepositAmount = normalizedDepositReceived
+    ? roundMoney(hasAmount ? parsedAmount : minimumDeposit)
+    : (hasAmount ? roundMoney(parsedAmount) : undefined);
+
+  return {
+    depositReceived: normalizedDepositReceived,
+    depositAmount: normalizedDepositAmount,
+  };
+};
 
 // GET /api/applications
 const getApplications = async (req, res) => {
@@ -99,13 +136,28 @@ const updateApplicationStatus = async (req, res) => {
   const application = await Application.findById(req.params.id);
   if (!application) return res.status(404).json({ message: 'Application not found' });
 
+  const packageRecord = await Package.findById(application.package);
+  if (!packageRecord) {
+    return res.status(400).json({ message: 'The package linked to this application no longer exists' });
+  }
+
+  const normalizedDeposit = resolveDepositUpdate({
+    packageRecord,
+    depositReceived,
+    depositAmount,
+  });
+
+  if (normalizedDeposit.error) {
+    return res.status(400).json({ message: normalizedDeposit.error });
+  }
+
   if (status) application.status = status;
   if (notes !== undefined) application.notes = notes;
   if (rejectionReason !== undefined) application.rejectionReason = rejectionReason;
   if (idVerified !== undefined) application.idVerified = idVerified;
   if (ecocashVerified !== undefined) application.ecocashVerified = ecocashVerified;
-  if (depositReceived !== undefined) application.depositReceived = depositReceived;
-  if (depositAmount !== undefined) application.depositAmount = depositAmount;
+  if (normalizedDeposit.depositReceived !== undefined) application.depositReceived = normalizedDeposit.depositReceived;
+  if (normalizedDeposit.depositAmount !== undefined) application.depositAmount = normalizedDeposit.depositAmount;
 
   if (status && status !== 'Draft') {
     application.reviewedBy = req.user._id;

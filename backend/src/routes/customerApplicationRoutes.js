@@ -42,8 +42,8 @@ const applicationValidation = [
 
 router.use(protect);
 
-router.get('/', getCustomerApplications);
-router.get('/:id', getCustomerApplicationById);
+router.get('/', authorize('Admin', 'Agent', 'Customer'), getCustomerApplications);
+router.get('/:id', authorize('Admin', 'Agent', 'Customer'), getCustomerApplicationById);
 
 router.post(
   '/',

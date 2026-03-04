@@ -372,6 +372,56 @@
           page-break-after: auto;
         }
       }
+
+      @media (max-width: 768px) {
+        .page {
+          width: auto;
+          min-height: auto;
+          margin: 0;
+          border-left: 0;
+          border-right: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+
+        .inner {
+          padding: 18px 16px 20px;
+        }
+
+        .hero,
+        .section-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .logo-lockup {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .logo-text h1,
+        h2 {
+          font-size: 26px;
+        }
+
+        h3 {
+          font-size: 17px;
+        }
+
+        p,
+        li {
+          font-size: 14px;
+        }
+
+        .table {
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+
+        .workflow {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -467,7 +517,7 @@
 
         <div class="callout">
           <strong>Recommended usage:</strong> Work from left to right through the customer lifecycle:
-          <em>Application -> Contract -> Payment Plan -> Payment Capture -> Collections -> Completion</em>.
+          <em>Application -> Contract -> Payment Plan -> Payment Capture -> Collections -> Installations -> Completion</em>.
         </div>
 
         <p class="footer-note">
@@ -496,9 +546,21 @@
             <span class="pill gold">Navigation</span>
             <ol>
               <li>Use the left sidebar to move between modules.</li>
+              <li>The dashboard and menu options adjust to your role after login.</li>
               <li>The top header shows the current page and your active role.</li>
               <li>Your profile menu allows password change and logout.</li>
             </ol>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill blue">Account Management</span>
+            <ul>
+              <li>Administrators can create new staff accounts from <strong>Users</strong>.</li>
+              <li>When creating a user, select the correct role such as <strong>Technician</strong>, <strong>Agent</strong>, or <strong>Collections Officer</strong>.</li>
+              <li>Technician accounts can sign in normally and will only see work assigned to them.</li>
+            </ul>
           </div>
         </div>
 
@@ -524,6 +586,10 @@
                 <tr>
                   <td>Collections Officer</td>
                   <td>Installments, reminders, receipt lookups, voids, arrears, and settlements</td>
+                </tr>
+                <tr>
+                  <td>Technician</td>
+                  <td>Assigned installation jobs, scheduling details, checklist updates, proof of installation, and handover status</td>
                 </tr>
                 <tr>
                   <td>Customer</td>
@@ -715,6 +781,47 @@
 
     <section class="page page-break">
       <div class="inner">
+        <p class="eyebrow">Fulfillment</p>
+        <h2>Installations and Technician Workflow</h2>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill blue">11. Create an Installation Job</span>
+            <ol>
+              <li>Open <strong>Installations</strong>.</li>
+              <li>Select the contract that is ready for fulfillment.</li>
+              <li>Assign a technician, set the planned date, and save the job.</li>
+              <li>The job is then visible to the assigned technician after login.</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <span class="pill green">12. Technician Daily Use</span>
+            <ol>
+              <li>The technician signs in with their own account.</li>
+              <li>The dashboard shows only assigned jobs, upcoming visits, and revisit work.</li>
+              <li>Open <strong>Installations</strong> to update status, notes, proof of installation, and handover details.</li>
+              <li>Move the job through <strong>Scheduled</strong>, <strong>In Progress</strong>, <strong>Installed</strong>, or <strong>Revisit Required</strong> as work changes.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill gold">13. Completion Rules</span>
+            <ul>
+              <li>Only assigned technicians should update field progress on their own jobs.</li>
+              <li>Capture customer handover confirmation before marking installation complete.</li>
+              <li>Keep proof-of-installation links and technician notes up to date for audit and support.</li>
+              <li>Financial completion and installation completion together form the full customer closure process.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page page-break">
+      <div class="inner">
         <p class="eyebrow">Common Scenarios</p>
         <h2>Recommended Step-by-Step Workflows</h2>
 
@@ -745,6 +852,16 @@
 
         <div class="section section-grid">
           <div class="card">
+            <span class="pill blue">Technician Assignment Flow</span>
+            <ol>
+              <li>An administrator creates the technician account from <strong>Users</strong>.</li>
+              <li>The installation job is assigned to that technician.</li>
+              <li>The technician signs in and reviews the assigned workload from the dashboard.</li>
+              <li>The technician updates progress inside <strong>Installations</strong> until the job is complete.</li>
+            </ol>
+          </div>
+
+          <div class="card">
             <span class="pill red">Customer Pays Off Early</span>
             <ol>
               <li>Open the contract in Payment Plans.</li>
@@ -754,13 +871,16 @@
               <li>The remaining schedule is closed automatically.</li>
             </ol>
           </div>
+        </div>
 
+        <div class="section">
           <div class="card">
             <span class="pill gold">Password or Access Issue</span>
             <ol>
               <li>Use <strong>Forgot Password</strong> on the login page.</li>
               <li>The system sends a reset email.</li>
               <li>If the account is inactive, an administrator must reactivate it.</li>
+              <li>If a technician cannot see work, confirm that an installation job has actually been assigned to that account.</li>
             </ol>
           </div>
         </div>
@@ -770,6 +890,7 @@
             <span class="pill blue">Support Checklist</span>
             <ul>
               <li>Confirm the user role first.</li>
+              <li>Check technician assignment if field staff cannot see installation work.</li>
               <li>Check that the correct contract or application status is set.</li>
               <li>Verify deposit status before expecting payment-plan actions.</li>
               <li>Confirm package status if a package is not selectable.</li>

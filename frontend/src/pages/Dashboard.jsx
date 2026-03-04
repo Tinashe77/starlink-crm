@@ -105,20 +105,29 @@ export default function Dashboard() {
       setError('');
 
       try {
+        if (isTechnician) {
+          const installationsRes = await getInstallations();
+          setApplications([]);
+          setContracts([]);
+          setScheduleItems([]);
+          setPayments([]);
+          setCollections(null);
+          setInstallations(installationsRes.data);
+          return;
+        }
+
         const [
           applicationsRes,
           contractsRes,
           scheduleRes,
           paymentsRes,
           collectionsRes,
-          installationsRes,
         ] = await Promise.all([
           getCustomerApplications(),
           getContracts(),
           getPaymentPlans(),
           getPayments(),
           canSeeCollections ? getCollectionsOverview() : Promise.resolve(null),
-          isTechnician ? getInstallations() : Promise.resolve(null),
         ]);
 
         setApplications(applicationsRes.data);
@@ -126,7 +135,7 @@ export default function Dashboard() {
         setScheduleItems(scheduleRes.data);
         setPayments(paymentsRes.data);
         setCollections(collectionsRes?.data || null);
-        setInstallations(installationsRes?.data || []);
+        setInstallations([]);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load dashboard');
       } finally {

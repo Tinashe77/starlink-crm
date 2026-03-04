@@ -19,6 +19,7 @@ import PaymentPlans from './pages/PaymentPlans';
 import PaymentStatement from './pages/PaymentStatement';
 import Collections from './pages/Collections';
 import Installations from './pages/Installations';
+import SupportTickets from './pages/SupportTickets';
 
 export default function App() {
   return (
@@ -38,11 +39,13 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/change-password" element={<ChangePassword />} />
-              <Route
-                path="/customer-applications"
-                element={<CustomerApplications />}
-              />
-              <Route element={<ProtectedRoute allowedRoles={['Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['Admin', 'Agent', 'Customer']} />}>
+                <Route
+                  path="/customer-applications"
+                  element={<CustomerApplications />}
+                />
+              </Route>
+              <Route element={<ProtectedRoute allowedRoles={['Admin', 'Agent', 'Collections Officer', 'Customer']} />}>
                 <Route
                   path="/contracts"
                   element={<Contracts />}
@@ -64,6 +67,10 @@ export default function App() {
                 <Route
                   path="/installations"
                   element={<Installations />}
+                />
+                <Route
+                  path="/support-tickets"
+                  element={<SupportTickets />}
                 />
               </Route>
               <Route element={<ProtectedRoute allowedRoles={['Admin', 'Agent', 'Collections Officer']} />}>

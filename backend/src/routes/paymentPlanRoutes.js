@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.use(protect);
 
-router.get('/', authorize('Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer'), getPaymentSchedule);
+router.get('/', authorize('Admin', 'Agent', 'Collections Officer', 'Customer'), getPaymentSchedule);
 
 router.post(
   '/generate',
