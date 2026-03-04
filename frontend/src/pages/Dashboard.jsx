@@ -18,6 +18,7 @@ import { getContracts } from '../api/contracts';
 import { getPaymentPlans } from '../api/paymentPlans';
 import { getPayments } from '../api/payments';
 import { getCollectionsOverview } from '../api/collections';
+import { getInstallations } from '../api/installations';
 
 const STAFF_COLLECTIONS_ROLES = ['Admin', 'Agent', 'Collections Officer'];
 const CUSTOMER_ROLE = 'Customer';
@@ -92,8 +93,10 @@ export default function Dashboard() {
   const [scheduleItems, setScheduleItems] = useState([]);
   const [payments, setPayments] = useState([]);
   const [collections, setCollections] = useState(null);
+  const [installations, setInstallations] = useState([]);
 
   const isCustomer = user?.role === CUSTOMER_ROLE;
+  const isTechnician = user?.role === 'Technician';
   const canSeeCollections = STAFF_COLLECTIONS_ROLES.includes(user?.role);
 
   useEffect(() => {
@@ -102,25 +105,28 @@ export default function Dashboard() {
       setError('');
 
       try {
-        const requests = [
+        const [
+          applicationsRes,
+          contractsRes,
+          scheduleRes,
+          paymentsRes,
+          collectionsRes,
+          installationsRes,
+        ] = await Promise.all([
           getCustomerApplications(),
           getContracts(),
           getPaymentPlans(),
           getPayments(),
-        ];
-
-        if (canSeeCollections) {
-          requests.push(getCollectionsOverview());
-        }
-
-        const results = await Promise.all(requests);
-        const [applicationsRes, contractsRes, scheduleRes, paymentsRes, collectionsRes] = results;
+          canSeeCollections ? getCollectionsOverview() : Promise.resolve(null),
+          isTechnician ? getInstallations() : Promise.resolve(null),
+        ]);
 
         setApplications(applicationsRes.data);
         setContracts(contractsRes.data);
         setScheduleItems(scheduleRes.data);
         setPayments(paymentsRes.data);
         setCollections(collectionsRes?.data || null);
+        setInstallations(installationsRes?.data || []);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load dashboard');
       } finally {
@@ -129,7 +135,7 @@ export default function Dashboard() {
     };
 
     loadDashboard();
-  }, [canSeeCollections]);
+  }, [canSeeCollections, isTechnician]);
 
   if (loading) {
     return (
@@ -173,6 +179,14 @@ export default function Dashboard() {
   const recentPayments = [...payments]
     .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
     .slice(0, 5);
+  const technicianAssigned = installations;
+  const technicianScheduled = technicianAssigned.filter((item) => item.status === 'Scheduled');
+  const technicianInProgress = technicianAssigned.filter((item) => item.status === 'In Progress');
+  const technicianRevisits = technicianAssigned.filter((item) => item.status === 'Revisit Required');
+  const technicianCompleted = technicianAssigned.filter((item) => item.status === 'Installed');
+  const technicianNextJob = [...technicianAssigned]
+    .filter((item) => item.scheduledFor)
+    .sort((a, b) => new Date(a.scheduledFor) - new Date(b.scheduledFor))[0] || null;
 
   const customerStats = [
     {
@@ -271,9 +285,49 @@ export default function Dashboard() {
     });
   }
 
+  const technicianStats = [
+    {
+      label: 'Assigned Jobs',
+      value: technicianAssigned.length,
+      detail: technicianAssigned.length ? 'Installation jobs assigned to you' : 'No jobs assigned yet',
+      icon: ClipboardList,
+      tone: 'blue',
+    },
+    {
+      label: 'Scheduled',
+      value: technicianScheduled.length,
+      detail: technicianScheduled.length ? 'Ready for upcoming visits' : 'No scheduled visits',
+      icon: CalendarClock,
+      tone: 'gold',
+    },
+    {
+      label: 'In Progress',
+      value: technicianInProgress.length,
+      detail: technicianInProgress.length ? 'Jobs currently underway' : 'No active site work',
+      icon: Activity,
+      tone: 'green',
+    },
+    {
+      label: 'Revisits',
+      value: technicianRevisits.length,
+      detail: technicianRevisits.length ? 'Jobs needing a follow-up visit' : 'No revisit backlog',
+      icon: AlertTriangle,
+      tone: 'red',
+    },
+    {
+      label: 'Installed',
+      value: technicianCompleted.length,
+      detail: technicianCompleted.length ? 'Jobs marked installed' : 'No completed installs yet',
+      icon: CheckCircle2,
+      tone: 'navy',
+    },
+  ];
+
   const headerCopy = isCustomer
     ? 'Track your application progress, contract status, upcoming payments, and recent activity from one place.'
-    : 'Monitor the application pipeline, contracts, payments, and operational priorities that need attention today.';
+    : isTechnician
+      ? 'Review your assigned installation jobs, upcoming visits, and revisit work from one operational view.'
+      : 'Monitor the application pipeline, contracts, payments, and operational priorities that need attention today.';
 
   return (
     <div className="p-6 md:p-8">
@@ -311,6 +365,10 @@ export default function Dashboard() {
                     ? nextDueItem
                       ? 'Stay current on payments'
                       : 'Account up to date'
+                    : isTechnician
+                      ? technicianNextJob
+                        ? 'Prepare for next site visit'
+                        : 'Await new assignment'
                     : pendingApplications.length
                       ? 'Review pending applications'
                       : 'Monitor operations'}
@@ -321,8 +379,10 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <div className={`mt-6 grid grid-cols-1 gap-4 ${isCustomer ? 'xl:grid-cols-4' : staffStats.length > 4 ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>
-        {(isCustomer ? customerStats : staffStats).map((item) => (
+      <div className={`mt-6 grid grid-cols-1 gap-4 ${
+        isCustomer ? 'xl:grid-cols-4' : isTechnician ? 'xl:grid-cols-5' : staffStats.length > 4 ? 'xl:grid-cols-5' : 'xl:grid-cols-4'
+      }`}>
+        {(isCustomer ? customerStats : isTechnician ? technicianStats : staffStats).map((item) => (
           <StatCard key={item.label} {...item} />
         ))}
       </div>
@@ -413,6 +473,99 @@ export default function Dashboard() {
                 No contracts are available on your account yet.
               </div>
             )}
+          </SectionCard>
+        </div>
+      ) : isTechnician ? (
+        <div className="mt-6 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          <SectionCard
+            eyebrow="Assigned Work"
+            title="My Installation Queue"
+            action={<Activity className="text-[var(--brand-cyan)]" size={20} />}
+          >
+            {technicianAssigned.length > 0 ? (
+              <div className="space-y-3">
+                {technicianAssigned.slice(0, 6).map((job) => (
+                  <ListRow
+                    key={job._id}
+                    title={`${job.jobNumber} · ${job.contract?.customer?.fullName || 'Customer'}`}
+                    meta={`${job.contract?.contractRef || 'Contract'} · ${job.scheduledFor ? formatDate(job.scheduledFor) : 'Not scheduled'} · ${job.contract?.package?.name || 'Package'}`}
+                    badge={<Badge label={job.status} />}
+                    emphasis={job.status === 'In Progress' || job.status === 'Revisit Required'}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 px-4 py-4 text-sm text-slate-500">
+                No installation jobs are currently assigned to you.
+              </div>
+            )}
+          </SectionCard>
+
+          <SectionCard eyebrow="Next Visit" title="Upcoming Site Work">
+            {technicianNextJob ? (
+              <div className="space-y-3">
+                <ListRow
+                  title={technicianNextJob.jobNumber}
+                  meta={`${technicianNextJob.contract?.customer?.fullName || 'Customer'} · ${technicianNextJob.contract?.contractRef}`}
+                  badge={<Badge label={technicianNextJob.status} />}
+                  emphasis
+                />
+                <ListRow
+                  title="Scheduled time"
+                  meta={new Date(technicianNextJob.scheduledFor).toLocaleString()}
+                />
+                <ListRow
+                  title="Package"
+                  meta={technicianNextJob.contract?.package?.name || 'No package information'}
+                />
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-[var(--brand-green)]/18 bg-[rgba(26,182,108,0.08)] px-4 py-4 text-sm leading-7 text-slate-700">
+                You do not have a scheduled installation visit yet.
+              </div>
+            )}
+          </SectionCard>
+
+          <SectionCard eyebrow="Checklist Focus" title="What Needs Attention">
+            <div className="grid gap-3 md:grid-cols-2">
+              <ListRow
+                title="In-progress jobs"
+                meta="Complete checklists, signal optimization, and testing"
+                badge={<span className="text-sm font-semibold text-slate-900">{technicianInProgress.length}</span>}
+              />
+              <ListRow
+                title="Revisit required"
+                meta="Jobs that need a return trip or unresolved issue"
+                badge={<span className="text-sm font-semibold text-slate-900">{technicianRevisits.length}</span>}
+              />
+              <ListRow
+                title="Customer handovers"
+                meta={`${technicianAssigned.filter((job) => !job.customerHandoverConfirmed).length} jobs still need final handover confirmation`}
+                badge={<span className="text-sm font-semibold text-slate-900">{technicianAssigned.filter((job) => !job.customerHandoverConfirmed).length}</span>}
+              />
+              <ListRow
+                title="Proof of installation"
+                meta={`${technicianAssigned.filter((job) => !job.proofOfInstallationUrl).length} jobs missing proof links`}
+                badge={<span className="text-sm font-semibold text-slate-900">{technicianAssigned.filter((job) => !job.proofOfInstallationUrl).length}</span>}
+              />
+            </div>
+          </SectionCard>
+
+          <SectionCard
+            eyebrow="Technician Access"
+            title="What You Can Do"
+            action={<ArrowUpRight className="text-[var(--brand-cyan)]" size={20} />}
+          >
+            <div className="space-y-3">
+              {[
+                'Open Installations to view only the jobs assigned to you',
+                'Move assigned jobs through Scheduled, In Progress, Installed, Revisit Required, or Failed',
+                'Complete the installation checklist and handover details',
+                'Add proof-of-installation links and field notes',
+              ].map((item) => (
+                <ListRow key={item} title={item} />
+              ))}
+            </div>
           </SectionCard>
         </div>
       ) : (
@@ -559,6 +712,8 @@ export default function Dashboard() {
         <p className="mt-3 text-sm leading-7 text-slate-600">
           {isCustomer
             ? 'This dashboard is personalized to your account only. It summarizes your own applications, contracts, payment plan, and recorded payments.'
+            : isTechnician
+              ? 'This dashboard is scoped to technician work only. It highlights the installation jobs assigned to your account and the field tasks that still need action.'
             : 'This dashboard combines application, contract, payment-plan, payment, and collections data so staff can see where work is blocked and where money is due.'}
         </p>
       </div>

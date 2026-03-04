@@ -18,6 +18,7 @@ import ContractDocument from './pages/ContractDocument';
 import PaymentPlans from './pages/PaymentPlans';
 import PaymentStatement from './pages/PaymentStatement';
 import Collections from './pages/Collections';
+import Installations from './pages/Installations';
 
 export default function App() {
   return (
@@ -57,6 +58,12 @@ export default function App() {
                 <Route
                   path="/payment-plans/:contractId/statement"
                   element={<PaymentStatement />}
+                />
+              </Route>
+              <Route element={<ProtectedRoute allowedRoles={['Admin', 'Agent', 'Technician', 'Customer']} />}>
+                <Route
+                  path="/installations"
+                  element={<Installations />}
                 />
               </Route>
               <Route element={<ProtectedRoute allowedRoles={['Admin', 'Agent', 'Collections Officer']} />}>

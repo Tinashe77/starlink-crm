@@ -15,6 +15,7 @@ import {
   CalendarClock,
   ShieldAlert,
   BellRing,
+  Wrench,
 } from 'lucide-react';
 import BrandLogo from '../components/BrandLogo';
 
@@ -25,6 +26,7 @@ const navItems = [
   { to: '/customer-applications', label: 'Applications', icon: ClipboardList, roles: ALL_ROLES },
   { to: '/contracts', label: 'Contracts', icon: FileSignature, roles: ALL_ROLES },
   { to: '/payment-plans', label: 'Payment Plans', icon: CalendarClock, roles: ALL_ROLES },
+  { to: '/installations', label: 'Installations', icon: Wrench, roles: ['Admin', 'Agent', 'Technician', 'Customer'] },
   { to: '/collections', label: 'Collections', icon: ShieldAlert, roles: ['Admin', 'Agent', 'Collections Officer'] },
   { to: '/packages', label: 'Packages', icon: Package, roles: ['Admin'] },
   { to: '/users', label: 'Users', icon: Users, roles: ['Admin'] },
@@ -46,9 +48,9 @@ export default function AppLayout() {
   const activeItem = navItems.find((item) => location.pathname.startsWith(item.to));
 
   return (
-    <div className="app-shell flex min-h-screen bg-transparent p-3 md:p-4">
+    <div className="app-shell flex h-screen overflow-hidden bg-transparent p-3 md:p-4">
       <aside
-        className={`glass-panel relative flex flex-col rounded-[2rem] text-slate-900 transition-all duration-300 ${
+        className={`glass-panel sticky top-3 md:top-4 relative flex h-full flex-col overflow-hidden rounded-[2rem] text-slate-900 transition-all duration-300 ${
           sidebarOpen ? 'w-72 px-3 py-3' : 'w-[5.4rem] px-2 py-3'
         }`}
       >
@@ -79,7 +81,7 @@ export default function AppLayout() {
           )}
         </div>
 
-        <nav className="flex-1 space-y-1.5 px-2 pb-3">
+        <nav className="flex-1 space-y-1.5 overflow-y-auto px-2 pb-3">
           {visibleNav.map((item) => {
             const NavIcon = item.icon;
 
@@ -144,7 +146,7 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col pl-3 md:pl-4">
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden pl-3 md:pl-4">
         <header className="glass-panel-strong mb-3 flex flex-col gap-4 rounded-[2rem] px-5 py-4 md:mb-4 md:flex-row md:items-center md:justify-between md:px-6">
           <div className="min-w-0">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.38em] text-slate-400">StarConnect Africa Portal</p>
@@ -165,7 +167,7 @@ export default function AppLayout() {
           </div>
         </header>
 
-        <section className="glass-panel-strong min-h-0 flex-1 overflow-auto rounded-[2rem]">
+        <section className="glass-panel-strong min-h-0 flex-1 overflow-y-auto rounded-[2rem]">
           <Outlet />
         </section>
       </main>
