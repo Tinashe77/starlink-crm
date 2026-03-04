@@ -1,11 +1,18 @@
 const nodemailer = require('nodemailer');
 
+const emailPort = parseInt(process.env.EMAIL_PORT, 10);
+const useSecureTransport = emailPort === 465;
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT, 10),
+  port: emailPort,
+  secure: useSecureTransport,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    servername: process.env.EMAIL_HOST,
   },
 });
 
@@ -75,4 +82,79 @@ const sendWelcomeEmail = async (user, tempPassword) => {
   await sendEmail({ to: user.email, subject: 'Welcome to StarConnect CRM — Your Account Details', html });
 };
 
-module.exports = { sendEmail, sendPasswordResetEmail, sendWelcomeEmail };
+const sendPaymentReceiptEmail = async ({ customerName, email, receiptNumber, amount, contractRef, nextDueDate, nextDueAmount }) => {
+  if (!email) return;
+
+  const nextDueText = nextDueDate && nextDueAmount !== undefined
+    ? `<p><strong>Next Payment Due:</strong> ${new Date(nextDueDate).toLocaleDateString()} (USD ${Number(nextDueAmount).toFixed(2)})</p>`
+    : '<p><strong>Next Payment Due:</strong> No remaining installments.</p>';
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+      <h2 style="color: #1a56db;">StarConnect CRM — Payment Receipt</h2>
+      <p>Hi ${customerName},</p>
+      <p>We have recorded your installment payment successfully.</p>
+      <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+        <tr><td style="padding: 8px; background: #f3f4f6; font-weight: bold;">Receipt #</td><td style="padding: 8px; background: #f9fafb;">${receiptNumber}</td></tr>
+        <tr><td style="padding: 8px; background: #f3f4f6; font-weight: bold;">Contract</td><td style="padding: 8px; background: #f9fafb;">${contractRef}</td></tr>
+        <tr><td style="padding: 8px; background: #f3f4f6; font-weight: bold;">Amount Paid</td><td style="padding: 8px; background: #f9fafb;">USD ${Number(amount).toFixed(2)}</td></tr>
+      </table>
+      ${nextDueText}
+      <p>Thank you for staying current with your payment plan.</p>
+    </div>
+  `;
+
+  await sendEmail({ to: email, subject: `Payment Receipt ${receiptNumber}`, html });
+};
+
+const sendPaymentReminderEmail = async ({
+  customerName,
+  email,
+  contractRef,
+  dueDate,
+  amount,
+  reminderType = 'Due Soon',
+}) => {
+  if (!email) return;
+
+  const reminderCopy = {
+    'Due Soon': {
+      intro: 'This is a reminder that your next installment is due soon.',
+      guidance: 'Please complete the payment before the due date to avoid late status.',
+    },
+    'Due Today': {
+      intro: 'Your installment is due today.',
+      guidance: 'Please complete the payment today to keep your contract in good standing.',
+    },
+    Overdue: {
+      intro: 'Your installment is now overdue.',
+      guidance: 'Please complete the payment as soon as possible to avoid default status and late fees.',
+    },
+  };
+
+  const content = reminderCopy[reminderType] || reminderCopy['Due Soon'];
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+      <h2 style="color: #1a56db;">StarConnect CRM — Payment Reminder</h2>
+      <p>Hi ${customerName},</p>
+      <p>${content.intro}</p>
+      <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+        <tr><td style="padding: 8px; background: #f3f4f6; font-weight: bold;">Contract</td><td style="padding: 8px; background: #f9fafb;">${contractRef}</td></tr>
+        <tr><td style="padding: 8px; background: #f3f4f6; font-weight: bold;">Due Date</td><td style="padding: 8px; background: #f9fafb;">${new Date(dueDate).toLocaleDateString()}</td></tr>
+        <tr><td style="padding: 8px; background: #f3f4f6; font-weight: bold;">Amount Due</td><td style="padding: 8px; background: #f9fafb;">USD ${Number(amount).toFixed(2)}</td></tr>
+      </table>
+      <p>${content.guidance}</p>
+    </div>
+  `;
+
+  await sendEmail({ to: email, subject: `${reminderType} Payment Reminder for ${contractRef}`, html });
+};
+
+module.exports = {
+  sendEmail,
+  sendPasswordResetEmail,
+  sendWelcomeEmail,
+  sendPaymentReceiptEmail,
+  sendPaymentReminderEmail,
+};

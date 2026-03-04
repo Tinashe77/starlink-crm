@@ -18,7 +18,7 @@ router.post(
     body('name').notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
     body('role')
-      .isIn(['Admin', 'Agent', 'Technician', 'Collections Officer'])
+      .isIn(['Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer'])
       .withMessage('Invalid role'),
     body('password')
       .optional()
@@ -35,7 +35,7 @@ router.put(
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('role')
       .optional()
-      .isIn(['Admin', 'Agent', 'Technician', 'Collections Officer'])
+      .isIn(['Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer'])
       .withMessage('Invalid role'),
   ],
   validate,

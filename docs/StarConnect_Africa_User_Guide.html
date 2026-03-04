@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StarConnect Africa CRM User Guide</title>
+    <style>
+      :root {
+        --brand-navy: #173f8f;
+        --brand-cyan: #15a9e7;
+        --brand-green: #1ab66c;
+        --brand-red: #ef3b35;
+        --brand-gold: #f2bb2e;
+        --ink: #10213d;
+        --muted: #617089;
+        --line: #dce7f3;
+        --paper: #f7fbff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top right, rgba(21, 169, 231, 0.14), transparent 22%),
+          radial-gradient(circle at top left, rgba(26, 182, 108, 0.1), transparent 22%),
+          #edf5fb;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 18px auto;
+        background: white;
+        border: 1px solid rgba(220, 231, 243, 0.9);
+        box-shadow: 0 30px 80px rgba(16, 33, 61, 0.12);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .page::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 10px;
+        background: linear-gradient(
+          90deg,
+          var(--brand-green),
+          var(--brand-cyan),
+          var(--brand-navy),
+          var(--brand-red),
+          var(--brand-gold)
+        );
+      }
+
+      .inner {
+        padding: 24mm 18mm 18mm;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .hero-card,
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: linear-gradient(180deg, #ffffff, var(--paper));
+        box-shadow: 0 18px 40px rgba(16, 33, 61, 0.06);
+      }
+
+      .hero-card {
+        padding: 22px;
+      }
+
+      .logo-lockup {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo-mark {
+        width: 86px;
+        height: 86px;
+        position: relative;
+        flex: 0 0 86px;
+      }
+
+      .logo-mark .outer-a,
+      .logo-mark .outer-b,
+      .logo-mark .inner {
+        position: absolute;
+        border-radius: 999px;
+      }
+
+      .logo-mark .outer-a {
+        inset: 0;
+        border: 9px solid transparent;
+        border-top-color: var(--brand-green);
+        border-left-color: var(--brand-green);
+        transform: rotate(18deg);
+      }
+
+      .logo-mark .outer-b {
+        inset: 0;
+        border: 9px solid transparent;
+        border-right-color: var(--brand-cyan);
+        border-bottom-color: var(--brand-cyan);
+        transform: rotate(18deg);
+      }
+
+      .logo-mark .inner {
+        inset: 18px;
+        border: 9px solid var(--brand-red);
+      }
+
+      .logo-mark .gold-dot {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        left: 35px;
+        top: 35px;
+        border-radius: 999px;
+        background: var(--brand-gold);
+      }
+
+      .logo-mark .blue-dot,
+      .logo-mark .green-dot {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+      }
+
+      .logo-mark .blue-dot {
+        right: 8px;
+        top: 6px;
+        background: var(--brand-cyan);
+      }
+
+      .logo-mark .green-dot {
+        left: 8px;
+        bottom: 6px;
+        background: var(--brand-green);
+      }
+
+      .logo-mark .red-tail {
+        position: absolute;
+        width: 34px;
+        height: 7px;
+        right: 14px;
+        bottom: 18px;
+        background: var(--brand-red);
+        border-radius: 999px;
+        transform: rotate(42deg);
+      }
+
+      .logo-text h1 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1;
+        color: var(--brand-navy);
+        letter-spacing: -0.04em;
+      }
+
+      .logo-text p {
+        margin: 10px 0 0;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.42em;
+        color: var(--brand-cyan);
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--brand-cyan);
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+      }
+
+      h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      p,
+      li {
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .summary {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--brand-navy), var(--brand-cyan));
+        color: white;
+        border-radius: 22px;
+        box-shadow: 0 24px 50px rgba(23, 63, 143, 0.18);
+      }
+
+      .summary h3,
+      .summary p,
+      .summary li {
+        color: white;
+      }
+
+      .summary ul {
+        padding-left: 18px;
+        margin: 10px 0 0;
+      }
+
+      .section {
+        margin-top: 18px;
+      }
+
+      .section-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .pill.blue { color: var(--brand-navy); background: rgba(21, 169, 231, 0.12); border-color: rgba(21, 169, 231, 0.18); }
+      .pill.green { color: #0b6c43; background: rgba(26, 182, 108, 0.12); border-color: rgba(26, 182, 108, 0.18); }
+      .pill.red { color: #b0201b; background: rgba(239, 59, 53, 0.12); border-color: rgba(239, 59, 53, 0.18); }
+      .pill.gold { color: #8a6508; background: rgba(242, 187, 46, 0.14); border-color: rgba(242, 187, 46, 0.2); }
+
+      ol,
+      ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .workflow {
+        display: grid;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .step {
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .step-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--brand-navy), var(--brand-cyan));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 13px;
+        box-shadow: 0 10px 24px rgba(23, 63, 143, 0.2);
+      }
+
+      .step-body {
+        padding: 10px 12px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: #f9fcff;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .table th,
+      .table td {
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+
+      .table th {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+      }
+
+      .callout {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(21, 169, 231, 0.18);
+        background: linear-gradient(180deg, rgba(21, 169, 231, 0.08), rgba(21, 169, 231, 0.03));
+      }
+
+      .footer-note {
+        margin-top: 14px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        .page {
+          width: auto;
+          min-height: auto;
+          margin: 0;
+          border: 0;
+          box-shadow: none;
+          page-break-after: always;
+        }
+
+        .page:last-child {
+          page-break-after: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="page">
+      <div class="inner">
+        <div class="hero">
+          <div class="hero-card">
+            <div class="logo-lockup">
+              <div class="logo-mark" aria-hidden="true">
+                <div class="outer-a"></div>
+                <div class="outer-b"></div>
+                <div class="inner"></div>
+                <div class="gold-dot"></div>
+                <div class="blue-dot"></div>
+                <div class="green-dot"></div>
+                <div class="red-tail"></div>
+              </div>
+              <div class="logo-text">
+                <h1>StarConnect Africa</h1>
+                <p>Internet Without Limits</p>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px">
+              <p class="eyebrow">User Guide</p>
+              <h2>StarConnect CRM System Guide</h2>
+              <p class="muted" style="margin-top: 10px">
+                This guide explains how staff and customers use the StarConnect portal to manage
+                applications, contracts, payments, collections, and digital signing.
+              </p>
+            </div>
+          </div>
+
+          <div class="summary">
+            <span class="pill">Version</span>
+            <h3 style="margin-top: 12px">Operational Modules Included</h3>
+            <ul>
+              <li>User access and role management</li>
+              <li>Customer applications and approval workflow</li>
+              <li>Package and system settings administration</li>
+              <li>Contracts with online signing</li>
+              <li>Payment plans, payment capture, and collections</li>
+              <li>Receipts, reminders, and balance settlement</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill blue">Who This Is For</span>
+            <p style="margin-top: 10px">
+              This guide is intended for administrators, agents, collections officers, technicians,
+              and customers who interact with the StarConnect Africa portal.
+            </p>
+            <ul>
+              <li><strong>Admin:</strong> Full system control and configuration</li>
+              <li><strong>Agent:</strong> Applications, contracts, and customer workflow</li>
+              <li><strong>Collections Officer:</strong> Payments, reminders, receipts, and arrears</li>
+              <li><strong>Customer:</strong> Contract viewing, signing, and payment visibility</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <span class="pill green">Portal Structure</span>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Area</th>
+                  <th>Main Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Applications</td>
+                  <td>Capture and review customer onboarding information</td>
+                </tr>
+                <tr>
+                  <td>Contracts</td>
+                  <td>Generate agreements and manage deposit/activation status</td>
+                </tr>
+                <tr>
+                  <td>Payment Plans</td>
+                  <td>Track installment schedules, payments, and balance settlement</td>
+                </tr>
+                <tr>
+                  <td>Collections</td>
+                  <td>Monitor overdue accounts, receipts, and risk items</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Recommended usage:</strong> Work from left to right through the customer lifecycle:
+          <em>Application -> Contract -> Payment Plan -> Payment Capture -> Collections -> Completion</em>.
+        </div>
+
+        <p class="footer-note">
+          Tip: Open this document in a browser and use <strong>Print -> Save as PDF</strong> for a polished PDF copy.
+        </p>
+      </div>
+    </section>
+
+    <section class="page page-break">
+      <div class="inner">
+        <p class="eyebrow">Getting Started</p>
+        <h2>Login, Roles, and Daily Navigation</h2>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill blue">Sign In</span>
+            <ol>
+              <li>Open the portal login page.</li>
+              <li>Enter your email address and password.</li>
+              <li>Select <strong>Sign in</strong>.</li>
+              <li>After authentication, you will land on the main dashboard.</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <span class="pill gold">Navigation</span>
+            <ol>
+              <li>Use the left sidebar to move between modules.</li>
+              <li>The top header shows the current page and your active role.</li>
+              <li>Your profile menu allows password change and logout.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill green">Role Visibility</span>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>What They Normally Manage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Admin</td>
+                  <td>Users, packages, settings, contracts, payment plans, collections, and oversight</td>
+                </tr>
+                <tr>
+                  <td>Agent</td>
+                  <td>Applications, customer onboarding, contract generation, and assisted payment actions</td>
+                </tr>
+                <tr>
+                  <td>Collections Officer</td>
+                  <td>Installments, reminders, receipt lookups, voids, arrears, and settlements</td>
+                </tr>
+                <tr>
+                  <td>Customer</td>
+                  <td>View contracts, sign agreements, and monitor statements or payment progress</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill red">Security Notes</span>
+            <ul>
+              <li>Inactive users are blocked from active use of the system.</li>
+              <li>Only authorized roles can access finance and admin functions.</li>
+              <li>Customers can only view or sign records that belong to them.</li>
+              <li>Always log out after using shared or public computers.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page page-break">
+      <div class="inner">
+        <p class="eyebrow">Module Guide</p>
+        <h2>Applications, Packages, and Contracts</h2>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill blue">1. Customer Applications</span>
+            <div class="workflow">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">Open <strong>Applications</strong> and create a new customer application.</div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">Capture customer details, contact details, installation site, payment details, package choice, and declaration details.</div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">Submit the application, then move its status through review until it is approved or rejected.</div>
+              </div>
+              <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">Approved applications are made available for contract creation.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill green">2. Packages and Settings</span>
+            <ul>
+              <li>Packages define financial terms used by contracts.</li>
+              <li>Inactive packages are excluded from new applications.</li>
+              <li>System settings control:
+                <ul>
+                  <li>Late fee amount</li>
+                  <li>Grace period days</li>
+                  <li>Early settlement discount percentage</li>
+                  <li>EcoCash merchant code</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <span class="pill gold">3. Contracts</span>
+            <ul>
+              <li>Create contracts from approved applications.</li>
+              <li>The system pulls pricing from the selected package.</li>
+              <li>Contract numbers are generated automatically.</li>
+              <li>Deposit status can be updated from the contract record.</li>
+              <li>Customers can sign contracts online and download a copy.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Important:</strong> A contract must be created from an approved application, and the
+          deposit should be marked as paid before generating a payment plan.
+        </div>
+      </div>
+    </section>
+
+    <section class="page page-break">
+      <div class="inner">
+        <p class="eyebrow">Finance Workflow</p>
+        <h2>Payment Plans, Installments, and Statements</h2>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill blue">4. Generate a Payment Plan</span>
+            <ol>
+              <li>Open <strong>Payment Plans</strong>.</li>
+              <li>Locate a contract with deposit paid and no schedule.</li>
+              <li>Select <strong>Generate Plan</strong>.</li>
+              <li>Choose the first due date.</li>
+              <li>The system creates the linked installment schedule.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill green">5. Record a Payment</span>
+            <ol>
+              <li>Select <strong>Record Payment</strong> from the contract row or unpaid installment row.</li>
+              <li>Enter the amount received, payment date, method, and optional EcoCash reference.</li>
+              <li>Save the transaction.</li>
+              <li>The installment is updated automatically.</li>
+              <li>If all installments are paid, the contract is marked <strong>Completed</strong>.</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <span class="pill gold">6. View the Statement</span>
+            <ol>
+              <li>Select <strong>View Statement</strong> for the contract.</li>
+              <li>The system generates the 8-week payment tracking card.</li>
+              <li>The statement shows due dates, payment dates, receipt numbers, and completion status.</li>
+              <li>Use browser print to save or print a hard copy.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill red">7. Settle Balance</span>
+            <ul>
+              <li>If a customer wants to clear the remaining balance at once, select <strong>Settle Balance</strong>.</li>
+              <li>The system settles all remaining unpaid installments in one action.</li>
+              <li>If enabled, the early settlement discount is applied automatically.</li>
+              <li>The contract is then recalculated and normally moves to <strong>Completed</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page page-break">
+      <div class="inner">
+        <p class="eyebrow">Collections</p>
+        <h2>Receipts, Reminders, and Arrears Management</h2>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill blue">8. Collections Dashboard</span>
+            <ul>
+              <li>Shows due today, overdue amounts, default-risk items, and recent payments.</li>
+              <li>Highlights the collections queue for follow-up.</li>
+              <li>Provides quick links to statements for at-risk customers.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <span class="pill green">9. Automated Daily Processing</span>
+            <ul>
+              <li>The system checks installment status daily.</li>
+              <li>Pending installments can move to <strong>Late</strong> or <strong>Defaulted</strong> based on settings.</li>
+              <li>Reminder emails are sent as <strong>Due Soon</strong>, <strong>Due Today</strong>, or <strong>Overdue</strong>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill gold">10. Receipt Lookup and Voiding</span>
+            <ol>
+              <li>Open <strong>Collections</strong>.</li>
+              <li>Use <strong>Receipt Lookup</strong> to search by receipt number.</li>
+              <li>Review the linked customer, contract, installment, and payment method.</li>
+              <li>If necessary, authorized roles can void the receipt.</li>
+              <li>Voiding reverses the payment from the linked installment and recalculates the contract.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Collections best practice:</strong> Use the queue daily, confirm customer contact details
+          are correct, and follow up on overdue accounts before they move into default status.
+        </div>
+      </div>
+    </section>
+
+    <section class="page page-break">
+      <div class="inner">
+        <p class="eyebrow">Common Scenarios</p>
+        <h2>Recommended Step-by-Step Workflows</h2>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill blue">New Customer Onboarding</span>
+            <ol>
+              <li>Create the application.</li>
+              <li>Review and approve it.</li>
+              <li>Generate the contract.</li>
+              <li>Send the customer to sign online.</li>
+              <li>Mark deposit paid.</li>
+              <li>Generate the payment plan.</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <span class="pill green">Weekly Collections Flow</span>
+            <ol>
+              <li>Check the Collections dashboard.</li>
+              <li>Review due today and overdue items.</li>
+              <li>Record incoming payments.</li>
+              <li>Send reminders where needed.</li>
+              <li>Use receipt lookup for reconciliations.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section section-grid">
+          <div class="card">
+            <span class="pill red">Customer Pays Off Early</span>
+            <ol>
+              <li>Open the contract in Payment Plans.</li>
+              <li>Select <strong>Settle Balance</strong>.</li>
+              <li>Choose whether to apply the early settlement discount.</li>
+              <li>Confirm the settlement details.</li>
+              <li>The remaining schedule is closed automatically.</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <span class="pill gold">Password or Access Issue</span>
+            <ol>
+              <li>Use <strong>Forgot Password</strong> on the login page.</li>
+              <li>The system sends a reset email.</li>
+              <li>If the account is inactive, an administrator must reactivate it.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card">
+            <span class="pill blue">Support Checklist</span>
+            <ul>
+              <li>Confirm the user role first.</li>
+              <li>Check that the correct contract or application status is set.</li>
+              <li>Verify deposit status before expecting payment-plan actions.</li>
+              <li>Confirm package status if a package is not selectable.</li>
+              <li>Use receipt lookup if payment data appears inconsistent.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

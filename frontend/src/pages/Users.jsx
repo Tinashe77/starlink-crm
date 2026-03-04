@@ -5,7 +5,7 @@ import Badge from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
 import { Plus, Pencil, Power, Trash2 } from 'lucide-react';
 
-const ROLES = ['Admin', 'Agent', 'Technician', 'Collections Officer'];
+const ROLES = ['Admin', 'Agent', 'Technician', 'Collections Officer', 'Customer'];
 const emptyForm = { name: '', email: '', phone: '', role: 'Agent', password: '' };
 
 export default function Users() {

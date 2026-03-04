@@ -1,1 +1,116 @@
 @import "tailwindcss";
+
+:root {
+  --brand-navy: #173f8f;
+  --brand-cyan: #15a9e7;
+  --brand-green: #1ab66c;
+  --brand-red: #ef3b35;
+  --brand-gold: #f2bb2e;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: rgba(255, 255, 255, 0.94);
+  --line-soft: rgba(148, 163, 184, 0.22);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    "Avenir Next",
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(26, 182, 108, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(21, 169, 231, 0.18), transparent 32%),
+    linear-gradient(180deg, #f8fbff 0%, #eef6fb 48%, #eef8f4 100%);
+  color: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(21, 169, 231, 0.18);
+  color: #082f49;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(21, 169, 231, 0.4), rgba(23, 63, 143, 0.34));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  pointer-events: none;
+  filter: blur(12px);
+  opacity: 0.7;
+  z-index: -1;
+}
+
+.app-shell::before {
+  top: 2rem;
+  right: 3rem;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(21, 169, 231, 0.22), transparent 65%);
+}
+
+.app-shell::after {
+  bottom: 1rem;
+  left: 1rem;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(26, 182, 108, 0.18), transparent 62%);
+}
+
+.glass-panel {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(18px);
+}
+
+.glass-panel-strong {
+  background: var(--surface-strong);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 26px 60px rgba(17, 24, 39, 0.08),
+    0 6px 18px rgba(21, 169, 231, 0.08);
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, var(--brand-navy), var(--brand-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
