@@ -202,7 +202,7 @@ export default function Collections() {
                   <td className="px-4 py-3">
                     <Badge label={item.status} />
                   </td>
-                  <td className="px-4 py-3">
+                  <td cl assName="px-4 py-3">
                     <Link
                       to={`/payment-plans/${item.contract?._id}/statement`}
                       className="text-xs font-medium text-blue-700 hover:text-blue-900"
