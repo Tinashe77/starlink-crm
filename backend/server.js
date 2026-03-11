@@ -24,7 +24,10 @@ const errorHandler = require('./src/middleware/errorHandler');
 const app = express();
 
 // Middleware
-app.use(cors({ origin: process.env.APP_URL || '*' }));
+const allowedOrigins = process.env.APP_URL
+  ? process.env.APP_URL.split(',').map((o) => o.trim())
+  : ['*'];
+app.use(cors({ origin: allowedOrigins.length === 1 && allowedOrigins[0] === '*' ? '*' : allowedOrigins }));
 app.use(express.json());
 
 // Routes
